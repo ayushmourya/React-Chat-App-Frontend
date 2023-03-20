@@ -1,45 +1,52 @@
 import React, { useState } from 'react';
-
-import { useLocation } from 'react-router-dom';
-import { TextField, Button, Box, Typography } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { AddBox as CreateRoomIllustration } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  VStack,
+  Text,
+  useToast,
+  extendTheme,
+  ChakraProvider,
+  Center,
+} from '@chakra-ui/react';
+import { ColorModeScript } from '@chakra-ui/color-mode';
+import { createIcon } from '@chakra-ui/icon';
 import axios from 'axios';
 
-const theme = createTheme({
-  palette: {
+const theme = extendTheme({
+  fonts: {
+    heading: 'Montserrat, sans-serif',
+    body: 'Montserrat, sans-serif',
+  },
+  colors: {
     primary: {
-      main: '#0069D9',
+      500: '#0069D9',
     },
-    background: {
-      default: '#F4F4F4',
-    },
-  },
-  shape: {
-    borderRadius: 10,
-  },
-  typography: {
-    fontFamily: 'Montserrat, sans-serif',
   },
 });
 
+const CreateRoomIllustration = createIcon({
+  displayName: 'CreateRoomIllustration',
+  viewBox: '0 0 24 24',
+  path: (
+    <path
+      fill="currentColor"
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"
+    />
+  ),
+});
+
 const CreateRoomForm = () => {
-
-  // check if the user is logged in or not, if not redirect to login page
-  // check localstorage for token and if not present redirect to login page
-
-  const token = localStorage.getItem('token');
-  if (!token) {
-    window.location.href = '/login';
-  }
-
-
-
-
-  const location = useLocation();
+  const toast = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [password, setPassword] = useState('');
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [roomId, setRoomId] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -51,71 +58,64 @@ const CreateRoomForm = () => {
         password,
       });
 
-      const roomId = response.data._id;
-      if (response.data.isPrivate) {
-        const isPasswordCorrect = prompt('Please enter the password for this room:');
-        if (isPasswordCorrect === password) {
-          // Update the URL with the new room ID
-          const newUrl = `/room/${roomId}`;
-          window.history.pushState(null, '', newUrl);
-        } else {
-          alert('Incorrect password!');
-        }
-      } else {
-        // Update the URL with the new room ID
-        const newUrl = `/room/${roomId}`;
-        window.history.pushState(null, '', newUrl);
-      }
+      setRoomId(response.data._id);
+      setShowSuccessMessage(true);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleGoToRoom = () => {
+    window.location.href = `/room/${roomId}`;
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Box sx={{ display: 'flex', maxWidth: 600, width: '100%', m: 2, p: 3, boxShadow: 3, borderRadius: 10, bgcolor: 'background.paper' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50%' }}>
-            <CreateRoomIllustration sx={{ width: '100%', height: '100%' }} />
-          </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', width: '50%', ml: 3 }}>
-            <Typography variant="h4" gutterBottom>Create a New Room</Typography>
+    <ChakraProvider theme={theme}>
+      <ColorModeScript />
+      <Center h="100vh">
+        {showSuccessMessage ? (
+          <VStack spacing={6} p={6} bg="white" borderRadius="lg" boxShadow="md">
+            <Text fontSize="2xl" fontWeight="bold">Room created successfully!</Text>
+            <Button onClick={handleGoToRoom} colorScheme="primary">
+              Go to Room
+            </Button>
+          </VStack>
+        ) : (
+          <VStack spacing={6} p={6} bg="white" borderRadius="lg" boxShadow="md">
+            <CreateRoomIllustration boxSize="100px" />
+            <Text fontSize="2xl">Create a New Room</Text>
             <form onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Name"
-                variant="outlined"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Description"
-                variant="outlined"
-                multiline
-                rows={4}
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Password (optional)"
-                variant="outlined"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-              <Button type="submit" variant="contained" sx={{ mt: 2 }} color="primary">
+              <FormControl id="name">
+                <FormLabel>Name</FormLabel>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </FormControl>
+              <FormControl id="description">
+                <FormLabel>Description</FormLabel>
+                <Textarea
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                />
+              </FormControl>
+              <FormControl id="password">
+                <FormLabel>Password (optional)</FormLabel>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+              </FormControl>
+              <Button type="submit" mt={4} colorScheme="primary">
                 Create Room
               </Button>
             </form>
-          </Box>
-        </Box>
-      </Box>
-    </ThemeProvider>
+          </VStack>
+        )}
+      </Center>
+    </ChakraProvider>
   );
 };
 

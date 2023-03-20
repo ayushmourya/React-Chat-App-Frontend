@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Table, Thead, Tbody, Tr, Th, Td, Button, Icon } from '@chakra-ui/react';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 
 const RoomList = () => {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-
     const token = localStorage.getItem('token');
     if (!token) {
       window.location.href = '/login';
     }
 
-    
-    
     const fetchRooms = async () => {
       try {
         const response = await axios.get('http://localhost:4000/api/rooms');
-        setRooms(response.data.filter(room => !room.isPrivate));
+        setRooms(response.data.filter((room) => !room.isPrivate));
       } catch (error) {
         console.log(error);
       }
@@ -25,25 +24,38 @@ const RoomList = () => {
     fetchRooms();
   }, []);
 
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+
   return (
-    <div className="container">
-      <h2>Room List</h2>
-      <div className="row">
+    <Table variant="simple">
+      <Thead>
+        <Tr>
+          <Th>Name</Th>
+          <Th>Description</Th>
+          <Th>Created At</Th>
+          <Th>Join Room</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
         {rooms.map((room) => (
-          <div key={room._id} className="col-md-4 mb-4">
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">{room.name}</h5>
-                <p className="card-text">{room.description}</p>
-                <Link to={`/room/${room._id}`} className="btn btn-primary">
+          <Tr key={room._id}>
+            <Td>{room.name}</Td>
+            <Td>{room.description}</Td>
+            <Td>{formatDate(room.createdAt)}</Td>
+            <Td>
+              <Link to={`/room/${room._id}`}>
+                <Button colorScheme="blue" rightIcon={<ChevronRightIcon />}>
                   Join Room
-                </Link>
-              </div>
-            </div>
-          </div>
+                </Button>
+              </Link>
+            </Td>
+          </Tr>
         ))}
-      </div>
-    </div>
+      </Tbody>
+    </Table>
   );
 };
 

@@ -1,75 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { TextField, Button, IconButton } from "@material-ui/core";
-import { Send as SendIcon, CloudUpload as CloudUploadIcon } from "@material-ui/icons";
-
-const useStyles = makeStyles((theme) => ({
-  chatWindow: {
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-    backgroundColor: "#f6f6f6",
-    border: "1px solid #ddd",
-    borderRadius: "5px",
-    overflow: "hidden",
-  },
-  chatHeader: {
-    backgroundColor: "#337ab7",
-    color: "#fff",
-    padding: "10px",
-  },
-  chatBody: {
-    flex: "1",
-    overflowY: "auto",
-    padding: "10px",
-  },
-  message: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    marginBottom: "10px",
-    "& div": {
-      padding: "7px",
-      border: "1px solid #ddd",
-      borderRadius: "5px",
-      backgroundColor: "#fff",
-      maxWidth: "500px",
-      wordWrap: "break-word",
-    },
-  },
-  youMessage: {
-    alignItems: "flex-end",
-    "& div": {
-      backgroundColor: "#dcf8c6",
-    },
-  },
-  messageMeta: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: "5px",
-    fontSize: "12px",
-    color: "#999",
-  },
-  chatFooter: {
-    display: "flex",
-    alignItems: "center",
-    padding: "10px",
-    borderTop: "1px solid #ddd",
-  },
-  fileInput: {
-    display: "none",
-  },
-}));
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import {
+  Box,
+  Flex,
+  Input,
+  Button,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Text,
+  Textarea,
+  Badge,
+} from "@chakra-ui/react";
+import { ChatIcon, AttachmentIcon } from "@chakra-ui/icons";
 
 function Chat({ socket, username, room }) {
-  const classes = useStyles();
+  const { id } = useParams();
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
-  const [privateMessageUser, setPrivateMessageUser] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [password, setPassword] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [Room, setRoom] = useState([]);
 
+  useEffect(() => {
+    axios.get(`http://localhost:4000/api/rooms/${id}`).then((response) => {
+      setRoom(response.data);
+      setIsPrivate(response.data.isPrivate);
+    });
+
+    socket.on("receive_message", (data) => {
+      setMessageList((list) => [...list, data]);
+    });
+  }, [socket, id]);
 
   const sendMessage = async () => {
+    if (!isAuthorized && isPrivate) {
+      alert("Please enter the password to join this room");
+      return;
+    }
+
     if (currentMessage !== "") {
       const messageData = {
         room: room,
@@ -80,108 +51,127 @@ function Chat({ socket, username, room }) {
           ":" +
           new Date(Date.now()).getMinutes(),
       };
-  
-      if (privateMessageUser !== "") {
-        messageData.privateMessageUser = privateMessageUser;
-        await socket.emit("private_message", messageData);
-      } else {
-        await socket.emit("send_message", messageData);
-      }
-  
+
+      await socket.emit("send_message", messageData);
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
-      setPrivateMessageUser("");
     }
   };
-  
 
-  useEffect(() => {
-    socket.on("receive_message", (data) => {
-      setMessageList((list) => [...list, data]);
-    });
-  }, [socket]);
+  const handlePasswordSubmit = (event) => {
+    event.preventDefault();
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    // handle file upload logic
+    if (password === Room.password) {
+      setIsAuthorized(true);
+      setPassword("");
+    } else {
+      alert("Incorrect password. Please try again.");
+    }
   };
 
   return (
-    <div className={classes.chatWindow}>
-      <div className={classes.chatHeader}>
-        <p>Live Chat</p>
-      </div>
-      <div className={classes.chatBody}>
-  {messageList.map((messageContent, index) => {
-    return (
-      <div
-        className={`${classes.message} ${
-          username === messageContent.author ? "" : classes.youMessage
-        }`}
-        key={index}
-      >
-        <div className={classes.messageContent}>
-          <p>{messageContent.message}</p>
-        </div>
-        <div className={classes.messageMeta}>
-          <p id="time">{messageContent.time}</p>
-          <p
-            id="author"
-            onClick={() =>
-              messageContent.author !== username &&
-              setPrivateMessageUser(messageContent.author)
-            }
-            style={{ cursor: "pointer" }}
-          >
-            {messageContent.author}
-          </p>
-        </div>
-      </div>
-    );
-  })}
-</div>
+    <Box bg="white" borderRadius="md" boxShadow="md" p={4} w="100%" maxW="xl" mx="auto">
+      <Flex align="center" justify="center" mb={4}>
+        <ChatIcon mr={2} />
+        <Text fontWeight="bold" fontSize="lg">
+          Live Chat
+        </Text>
+        {isPrivate && (
+          <Badge colorScheme="gray" ml={2}>
+            Private
+          </Badge>
+        )}
+      </Flex>
+      <Box bg="gray.100" borderRadius="md" p={2} overflowY="scroll" maxH="400px">
+        {isPrivate && !isAuthorized ? (
+          <form onSubmit={handlePasswordSubmit}>
+            <FormControl id="password">
+              <FormLabel>Password:</FormLabel>
+              <Input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              <FormErrorMessage>
+                Incorrect password. Please try again.
+              </FormErrorMessage>
+              <Button type="submit" mt={4} colorScheme="green">
+                Submit
+              </Button>
+            </FormControl>
+          </form>
+        ) : (
+          <>
+            {messageList.map((messageContent) => {
+              return (
+                <Box
+                  className="message"
+                  id={username === messageContent.author ? "you" : "other"}
+                  key={messageContent.time}
+                  mb={2}
+                >
+                  <Flex align="flex-start">
+                    <Box
+                      bg={
+                        username === messageContent.author
+                          ? "blue.500"
+                          : "gray.500"
+                      }
+                      borderRadius="full"
+                      p={2}
+                      color="white"
+                      mr={2}
+                    >
+                      <Text fontSize="12px">{messageContent.author}</Text>
+                    </Box>
+                    <Box>
+                      <Text fontSize="sm">{messageContent.message}</Text>
+                      <Text fontSize="xs" color="gray.500">
+                        {messageContent.time}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </Box>
+              );
+            })}
+            <Box mb={2}>
+              <Flex align="center">
+                <Textarea
+                  value={currentMessage}
+                  placeholder="Type a message..."
+                  onChange={(event) => {
+                    setCurrentMessage(event.target.value);
+                  }}
+                  onKeyPress={(event) => {
+                    event.key === "Enter" && sendMessage();
+                  }}
+                />
+                <Button
+                  onClick={sendMessage}
+                  ml={2}
+                  colorScheme="green"
+                  size="md"
+                  leftIcon={<ChatIcon />}
+                >
+                  Send
+                </Button>
 
-<div className={classes.chatFooter}>
-  {privateMessageUser !== "" && (
-    <p style={{ marginRight: "10px" }}>
-      Currently messaging: {privateMessageUser}
-    </p>
-  )}
-  <input
-    type="file"
-    id="file-upload"
-    className={classes.fileInput}
-    onChange={handleFileUpload}
-  />
-  <label htmlFor="file-upload">
-    <IconButton color="primary" component="span">
-      <CloudUploadIcon />
-    </IconButton>
-  </label>
-  <TextField
-    variant="outlined"
-    label="Type your message here"
-    value={currentMessage}
-    fullWidth
-    onChange={(event) => {
-      setCurrentMessage(event.target.value);
-    }}
-    onKeyPress={(event) => {
-      event.key === "Enter" && sendMessage();
-    }}
-  />
-  <Button
-    variant="contained"
-    color="primary"
-    endIcon={<SendIcon />}
-    onClick={sendMessage}
-  >
-    Send
-  </Button>
-</div>
-
-    </div>
+                <Button
+                  ml={2}
+                  colorScheme="green"
+                  size="md"
+                  leftIcon={<AttachmentIcon />}
+                >
+                  Attach
+                </Button>
+              </Flex>
+            </Box>
+          </>
+        )}
+      </Box>
+    </Box>
   );
+
 }
 
 export default Chat;

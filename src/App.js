@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ChakraProvider } from '@chakra-ui/react'
 
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
@@ -15,6 +16,7 @@ import Home from './Home';
 
 function App() {
   return (
+    <ChakraProvider>
     <Router>
       <div className="App">
         <Routes>
@@ -30,6 +32,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </ChakraProvider>
   );
 }
 
