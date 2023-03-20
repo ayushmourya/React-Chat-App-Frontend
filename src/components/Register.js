@@ -49,17 +49,18 @@ const Register = () => {
     formData.append('avatar', avatar);
   
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      const response = await fetch('http://localhost:4000/api/register', {
         method: 'POST',
         body: formData
       });
       const data = await response.json();
       console.log(data);
       setShowModal(false);
+      window.location.href = '/login';
     } catch (error) {
       console.error(error);
       setShowModal(false);
-      useNavigate = ('/login');
+
     }
   }
 

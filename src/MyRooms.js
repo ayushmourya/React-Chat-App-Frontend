@@ -1,26 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import Room from './components/Room';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const MyRooms = () => {
+const RoomList = () => {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+
+    
+    
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/rooms');
-        setRooms(response.data.filter(room => !room.password));
+        const response = await axios.get('http://localhost:4000/api/rooms');
+        setRooms(response.data.filter(room => !room.isPrivate));
       } catch (error) {
         console.log(error);
       }
     };
     fetchRooms();
   }, []);
-
-  const joinRoom = (roomId) => {
-    console.log(`Joining room ${roomId}`);
-    // Add your join room logic here
-  };
 
   return (
     <div className="container">
@@ -32,7 +35,9 @@ const MyRooms = () => {
               <div className="card-body">
                 <h5 className="card-title">{room.name}</h5>
                 <p className="card-text">{room.description}</p>
-                <button className="btn btn-primary" onClick={() => joinRoom(room._id)}>Join Room</button>
+                <Link to={`/room/${room._id}`} className="btn btn-primary">
+                  Join Room
+                </Link>
               </div>
             </div>
           </div>
@@ -42,4 +47,4 @@ const MyRooms = () => {
   );
 };
 
-export default MyRooms;
+export default RoomList;

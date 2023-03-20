@@ -24,6 +24,18 @@ const theme = createTheme({
 });
 
 const CreateRoomForm = () => {
+
+  // check if the user is logged in or not, if not redirect to login page
+  // check localstorage for token and if not present redirect to login page
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = '/login';
+  }
+
+
+
+
   const location = useLocation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -33,7 +45,7 @@ const CreateRoomForm = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/api/rooms', {
+      const response = await axios.post('http://localhost:4000/api/rooms', {
         name,
         description,
         password,
@@ -44,14 +56,14 @@ const CreateRoomForm = () => {
         const isPasswordCorrect = prompt('Please enter the password for this room:');
         if (isPasswordCorrect === password) {
           // Update the URL with the new room ID
-          const newUrl = `${location.pathname}/room/${roomId}`;
+          const newUrl = `/room/${roomId}`;
           window.history.pushState(null, '', newUrl);
         } else {
           alert('Incorrect password!');
         }
       } else {
         // Update the URL with the new room ID
-        const newUrl = `${location.pathname}/room/${roomId}`;
+        const newUrl = `/room/${roomId}`;
         window.history.pushState(null, '', newUrl);
       }
     } catch (error) {

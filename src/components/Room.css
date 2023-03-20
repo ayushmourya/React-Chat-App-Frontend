@@ -1,0 +1,23 @@
+.chatContainer {
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .messagesContainer {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  
+  .sendMessageContainer {
+    display: flex;
+    align-items: center;
+  }
+  
+  .sendMessageContainer > * {
+    margin-right: 10px;
+  }

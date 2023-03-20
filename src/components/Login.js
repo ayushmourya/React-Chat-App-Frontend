@@ -12,11 +12,11 @@ const Login = (props) => {
     setError('');
   
     try {
-      const response = await axios.post('http://localhost:3000/api/login', { username, password });
+      const response = await axios.post('http://localhost:4000/api/login', { username, password });
       const { user, token } = response.data;
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', token);
-      props.history.push('/rooms');
+      window.location.href = '/create-room';
     } catch (error) {
       setError(error.response.data.message);
     }

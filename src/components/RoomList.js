@@ -6,9 +6,17 @@ const RoomList = () => {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+
+    
+    
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/rooms');
+        const response = await axios.get('http://localhost:4000/api/rooms');
         setRooms(response.data.filter(room => !room.isPrivate));
       } catch (error) {
         console.log(error);
