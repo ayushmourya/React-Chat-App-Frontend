@@ -8,11 +8,11 @@ import Register from './components/Register';
 import Login from './components/Login';
 import RoomList from './components/RoomList';
 import Room from './components/Room';
-import HomePage from './components/HomePage';
 import CreateRoomForm from './CreateRoomForm';
 import PrivateChats from './PrivateChats';
 import MyRooms from './MyRooms';
 import Home from './Home';
+import UserPage from './UserPage';
 
 function App() {
   return (
@@ -29,6 +29,8 @@ function App() {
           <Route path="/create-room/:id" element={<RoomWithNavbar />} />
           <Route path="/private-chats" element={<PrivateChatsWithNavbar />} />
           <Route path="/myrooms" element={<MyRoomsWithNavbar />} />
+          <Route exact path="/user/:username" element={<UserPage />} />
+
         </Routes>
       </div>
     </Router>
@@ -53,6 +55,8 @@ function RoomListWithNavbar() {
     </>
   );
 }
+
+
 
 function RoomWithNavbar() {
   const location = useLocation();

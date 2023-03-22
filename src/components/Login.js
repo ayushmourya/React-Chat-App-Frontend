@@ -24,7 +24,7 @@ const Login = (props) => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:4000/api/login', {
+      const response = await axios.post('/api/chitchat/api/chitchat/login', {
         username,
         password,
       });

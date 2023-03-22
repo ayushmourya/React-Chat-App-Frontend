@@ -52,10 +52,12 @@ const CreateRoomForm = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:4000/api/rooms', {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const response = await axios.post('/api/chitchat/api/chitchat/rooms', {
         name,
         description,
         password,
+        owner: user.username,
       });
 
       setRoomId(response.data._id);
@@ -108,7 +110,7 @@ const CreateRoomForm = () => {
                   onChange={(event) => setPassword(event.target.value)}
                 />
               </FormControl>
-              <Button type="submit" mt={4} colorScheme="primary">
+              <Button type="submit" colorScheme="primary">
                 Create Room
               </Button>
             </form>
@@ -120,3 +122,4 @@ const CreateRoomForm = () => {
 };
 
 export default CreateRoomForm;
+

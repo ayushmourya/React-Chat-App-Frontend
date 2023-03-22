@@ -13,6 +13,8 @@ import Button from '@material-ui/core/Button';
 import SendIcon from '@material-ui/icons/Send';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import io from 'socket.io-client';
+import UserSidebar from './components/UserSidebar';
+import { Box } from '@chakra-ui/react';
 
 const useStyles = makeStyles((theme) => ({
 root: {
@@ -60,7 +62,7 @@ padding: theme.spacing(2),
 },
 }));
 
-function ChatBox() {
+function PrivateChats() {
 const token = localStorage.getItem('token');
 if (!token) {
 window.location.href = '/login';
@@ -113,8 +115,12 @@ const classes = useStyles();
 return (
 
 <>
-<Grid container justify="center" className={classes.root}>
-<Grid item xs={12} md={8} lg={6}>
+<Box className={classes.root}>
+<Grid container>
+        <Grid item xs={19} sm={4}>
+          <UserSidebar />
+        </Grid>
+
 <Paper elevation={3} className={classes.paper}>
 <div className={classes.chatHeader}>
 <h2>Chat Room</h2>
@@ -163,9 +169,11 @@ Upload
 </form>
 </Paper>
 </Grid>
-</Grid>
+</Box>
+
+
 </>
 );
 }
 
-export default ChatBox;
+export default PrivateChats;

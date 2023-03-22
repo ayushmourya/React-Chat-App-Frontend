@@ -4,7 +4,6 @@ export function useAuth() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // check for token in local storage
     const token = localStorage.getItem("token");
     if (token) {
       setAuthenticated(true);

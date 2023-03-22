@@ -6,6 +6,7 @@ import { ChevronRightIcon } from '@chakra-ui/icons';
 
 const RoomList = () => {
   const [rooms, setRooms] = useState([]);
+  const [currentUser, setCurrentUser] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -15,8 +16,10 @@ const RoomList = () => {
 
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/rooms');
-        setRooms(response.data.filter((room) => !room.isPrivate));
+        const response = await axios.get('/api/chitchat/api/chitchat/rooms');
+        const user = JSON.parse(localStorage.getItem('user'));
+        setCurrentUser(user.username);
+        setRooms(response.data.filter((room) => room.owner === user.username));
       } catch (error) {
         console.log(error);
       }

@@ -60,7 +60,7 @@ const Register = () => {
     formData.append('avatar', avatar);
 
     try {
-      const response = await fetch('http://localhost:4000/api/register', {
+      const response = await fetch('/api/chitchat/api/chitchat/register', {
         method: 'POST',
         body: formData,
       });
