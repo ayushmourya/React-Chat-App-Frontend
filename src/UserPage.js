@@ -22,7 +22,7 @@ const UserPage = () => {
       const fetchUser = async () => {
         try {
           const response = await axios.get(
-            `/api/chitchat/api/chitchat/user/${username}`,
+            `/api/chitchat/user/${username}`,
           );
           setUser(response.data);
         } catch (error) {

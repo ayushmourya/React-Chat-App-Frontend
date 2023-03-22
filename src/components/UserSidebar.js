@@ -8,7 +8,7 @@ function UserSidebar({ onSelectUser }) {
 
   useEffect(() => {
     const getUsers = async () => {
-      const response = await axios.get('/api/chitchat/api/chitchat/users');
+      const response = await axios.get('/api/chitchat/users');
       setUsers(response.data);
     };
     getUsers();

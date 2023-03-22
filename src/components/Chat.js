@@ -25,7 +25,7 @@ function Chat({ socket, username, room }) {
   const [Room, setRoom] = useState([]);
 
   useEffect(() => {
-    axios.get(`/api/chitchat/api/chitchat/rooms/${id}`).then((response) => {
+    axios.get(`/api/chitchat/rooms/${id}`).then((response) => {
       setRoom(response.data);
       setIsPrivate(response.data.isPrivate);
     });

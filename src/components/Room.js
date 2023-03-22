@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Chat from "./Chat";
 
-const socket = io.connect("http://localhost:4000");
+const socket = io.connect("http://localhost:8900");
 
 function Room({ match }) {
   const { id } = useParams();

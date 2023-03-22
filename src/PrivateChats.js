@@ -72,7 +72,7 @@ const [socket, setSocket] = useState(null);
 const [messages, setMessages] = useState([]);
 
 useEffect(() => {
-const newSocket = io('http://localhost:4000'); // replace with your server URL
+const newSocket = io('http://localhost:8900'); 
 setSocket(newSocket);
 
 

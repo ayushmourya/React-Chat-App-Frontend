@@ -53,7 +53,7 @@ const CreateRoomForm = () => {
 
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-      const response = await axios.post('/api/chitchat/api/chitchat/rooms', {
+      const response = await axios.post('/api/chitchat/rooms', {
         name,
         description,
         password,

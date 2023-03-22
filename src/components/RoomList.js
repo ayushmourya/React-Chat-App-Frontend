@@ -15,7 +15,7 @@ const RoomList = () => {
 
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('/api/chitchat/api/chitchat/rooms');
+        const response = await axios.get('/api/chitchat/rooms');
         setRooms(response.data.filter((room) => !room.isPrivate));
       } catch (error) {
         console.log(error);

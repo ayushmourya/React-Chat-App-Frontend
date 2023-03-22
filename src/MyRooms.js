@@ -16,7 +16,7 @@ const RoomList = () => {
 
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('/api/chitchat/api/chitchat/rooms');
+        const response = await axios.get('/api/chitchat/rooms');
         const user = JSON.parse(localStorage.getItem('user'));
         setCurrentUser(user.username);
         setRooms(response.data.filter((room) => room.owner === user.username));
