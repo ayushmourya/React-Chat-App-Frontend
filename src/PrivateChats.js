@@ -72,7 +72,7 @@ const [socket, setSocket] = useState(null);
 const [messages, setMessages] = useState([]);
 
 useEffect(() => {
-const newSocket = io('http://localhost:8900'); 
+const newSocket = io('http://34.238.154.41:8900'); 
 setSocket(newSocket);
 
 
